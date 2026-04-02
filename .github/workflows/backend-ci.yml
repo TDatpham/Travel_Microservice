@@ -1,0 +1,56 @@
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - service: auth-service
+            path: backend/services/auth-service
+          - service: hotel-service
+            path: backend/services/hotel-service
+          - service: discovery-server
+            path: backend/infrastructure/discovery-server
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: travel
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build and Test ${{ matrix.service }}
+      env:
+        GOOGLE_CLIENT_ID: mock-id
+        GOOGLE_CLIENT_SECRET: mock-secret
+        JWT_SECRET_KEY: mock-jwt-secret-key-at-least-32-chars-12345
+      run: |
+        cd ${{ matrix.path }}
+        mvn -B package --file pom.xml
+
+    - name: Docker Push (Mockup)
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "Pushing images for ${{ matrix.service }} to Docker Hub..."
+        # docker build . -t user/${{ matrix.service }}:latest
+        # docker push user/${{ matrix.service }}:latest

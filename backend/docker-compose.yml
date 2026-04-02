@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # Infrastructure
+  mysql-db:
+    image: mysql:8.0
+    container_name: 2rism-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: travel
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  # Microservices
+  discovery-server:
+    build:
+      context: ./infrastructure/discovery-server
+    ports:
+      - "8761:8761"
+
+  hotel-service:
+    build:
+      context: ./services/hotel-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql-db
+      - discovery-server
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/travel
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql-db
+      - discovery-server
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/travel
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+
+volumes:
+  mysql-data:
+

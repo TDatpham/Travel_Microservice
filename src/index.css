@@ -1183,3 +1183,17 @@ footer {
     font-size: 1.4rem;
   }
 }
+
+.auth-error-msg {
+  background: rgba(255, 71, 71, 0.1);
+  border: 1px solid rgba(255, 71, 71, 0.3);
+  color: #ff4747;
+  padding: 1.2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-weight: 500;
+}

@@ -1,9 +1,19 @@
-import React, { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { User, LogOut, ShoppingCart, Settings } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar = ({ variant = 'default' }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
   const close = () => setIsOpen(false);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   const navLinks = [
     { to: '/',             label: 'Home' },
@@ -14,6 +24,10 @@ const Navbar = ({ variant = 'default' }) => {
     { to: '/about',        label: 'About Us' },
     { to: '/contact',      label: 'Contact' },
   ];
+
+  if (user && user.role === 'ADMIN') {
+    navLinks.push({ to: '/admin', label: 'Admin' });
+  }
 
   return (
     <>
@@ -60,8 +74,44 @@ const Navbar = ({ variant = 'default' }) => {
 
         {/* Auth Buttons */}
         <div className="auth-buttons">
-          <Link to="/signin" className="btn-signin">Sign In</Link>
-          <Link to="/signup" className="btn-signup">Sign Up</Link>
+          {user ? (
+            <div className="user-nav-info" style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', color: variant === 'page' ? '#333' : '#fff' }}>
+              <Link to="/cart" title="My Cart" style={{ color: 'inherit', display: 'flex', alignItems: 'center', position: 'relative' }}>
+                <ShoppingCart size={22} />
+              </Link>
+              <Link to="/profile" title="My Profile" style={{ color: 'inherit', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '600', textDecoration: 'none' }}>
+                <div style={{
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  border: '2px solid rgba(255,255,255,0.7)',
+                  flexShrink: 0,
+                  background: 'linear-gradient(135deg, #ff7e5f, #654cf6)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.3rem',
+                  fontWeight: '700',
+                  color: 'white',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                }}>
+                  {user.avatar
+                    ? <img src={user.avatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : (user.name ? user.name.charAt(0).toUpperCase() : <User size={18} />)
+                  }
+                </div>
+              </Link>
+              <button onClick={handleLogout} className="btn-logout" title="Logout" style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '5px' }}>
+                <LogOut size={20} />
+              </button>
+            </div>
+          ) : (
+            <>
+              <Link to="/signin" className="btn-signin">Sign In</Link>
+              <Link to="/signup" className="btn-signup">Sign Up</Link>
+            </>
+          )}
         </div>
       </header>
 
