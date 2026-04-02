@@ -7,7 +7,11 @@ services:
     container_name: 2rism-mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
+<<<<<<< HEAD
       MYSQL_DATABASE: travel
+=======
+      MYSQL_DATABASE: travel_db
+>>>>>>> cc50dd47630d838d14d4054ee20ba0cc41f99226
     ports:
       - "3306:3306"
     volumes:
@@ -50,7 +54,11 @@ services:
       - mysql-db
       - discovery-server
     environment:
+<<<<<<< HEAD
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/travel
+=======
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/travel_db
+>>>>>>> cc50dd47630d838d14d4054ee20ba0cc41f99226
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
 
   auth-service:
@@ -62,7 +70,11 @@ services:
       - mysql-db
       - discovery-server
     environment:
+<<<<<<< HEAD
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/travel
+=======
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/travel_db
+>>>>>>> cc50dd47630d838d14d4054ee20ba0cc41f99226
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
 
 volumes:

@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+<<<<<<< HEAD
         include:
           - service: auth-service
             path: backend/services/auth-service
@@ -18,26 +19,38 @@ jobs:
             path: backend/services/hotel-service
           - service: discovery-server
             path: backend/infrastructure/discovery-server
+=======
+        service: [auth-service, hotel-service]
+>>>>>>> cc50dd47630d838d14d4054ee20ba0cc41f99226
 
     services:
       mysql:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
+<<<<<<< HEAD
           MYSQL_DATABASE: travel
+=======
+          MYSQL_DATABASE: travel_db
+>>>>>>> cc50dd47630d838d14d4054ee20ba0cc41f99226
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
     - uses: actions/checkout@v3
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> cc50dd47630d838d14d4054ee20ba0cc41f99226
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+<<<<<<< HEAD
 
     - name: Build and Test ${{ matrix.service }}
       env:
@@ -46,6 +59,12 @@ jobs:
         JWT_SECRET_KEY: mock-jwt-secret-key-at-least-32-chars-12345
       run: |
         cd ${{ matrix.path }}
+=======
+        
+    - name: Build and Test ${{ matrix.service }}
+      run: |
+        cd backend/services/${{ matrix.service }}
+>>>>>>> cc50dd47630d838d14d4054ee20ba0cc41f99226
         mvn -B package --file pom.xml
 
     - name: Docker Push (Mockup)
